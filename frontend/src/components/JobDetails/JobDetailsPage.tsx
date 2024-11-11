@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import { Job } from './types';
+import { Job } from '../../app/types';
+import './JobDetailsPage.css';
 
 const JobDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,7 +24,7 @@ const JobDetailsPage: React.FC = () => {
   if (!job) return <div>Loading...</div>;
 
   return (
-    <div className="job-details">
+    <div className="jobDetails">
       <h1>{job.title}</h1>
       <p>{job.description}</p>
       <p>Requirements: {job.requirements}</p>

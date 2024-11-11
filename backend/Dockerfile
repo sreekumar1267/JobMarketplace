@@ -13,6 +13,10 @@ RUN npm install -g typescript && npm install
 # Copy the remaining files
 COPY . .
 
+COPY ./prisma prisma
+RUN npx prisma generate
+RUN npx prisma migrate dev --name init
+
 # Build the TypeScript code
 RUN tsc
 

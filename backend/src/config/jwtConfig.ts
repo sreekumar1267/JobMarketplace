@@ -1,0 +1,1 @@
+export const JWT_SECRET: string = 'my-secret-key';

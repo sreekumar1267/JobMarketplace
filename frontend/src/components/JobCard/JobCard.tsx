@@ -1,6 +1,7 @@
 import React from 'react';
-import { Job } from '../app/types';
+import { Job } from '../../app/types';
 import { Link } from 'react-router-dom';
+import './JobCard.css';
 
 interface JobCardProps {
   job: Job;
@@ -8,7 +9,7 @@ interface JobCardProps {
 
 const JobCard: React.FC<JobCardProps> = ({ job }:JobCardProps) => {
   return (
-    <div className="job-card">
+    <div className="jobCard">
       <h3>{job.title}</h3>
       <p>{job.description}</p>
       <p>Bids: {job.bidsCount}</p>

@@ -1,13 +1,17 @@
-import { StrictMode } from 'react';
-import * as ReactDOM from 'react-dom/client';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Provider } from 'react-redux';
+import { store } from './store/store.ts';
+import App from './app/app.tsx';
 
-import App from './app/app';
+const queryClient = new QueryClient();
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
-root.render(
-  <StrictMode>
-    <App />
-  </StrictMode>
+ReactDOM.render(
+  <Provider store={store}>
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
+  </Provider>,
+  document.getElementById('root')
 );

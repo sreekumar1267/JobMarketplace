@@ -1,0 +1,20 @@
+.jobCard {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: #f9f9f9;
+  
+    h3 {
+      margin: 0 0 0.5rem 0;
+    }
+  
+    p {
+      margin: 0.25rem 0;
+    }
+  
+    a {
+      color: #007bff;
+      text-decoration: none;
+    }
+  }
+  

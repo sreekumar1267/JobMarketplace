@@ -1,64 +1,44 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import sqlite3 from 'sqlite3';
+import jobRoutes from './routes/jobRoutes';
+import bidRoutes from './routes/bidRoutes';
 import { Request, Response } from 'express';
+import { apiLimiter } from './middlewares/rateLimiter';
+import { errorHandler } from './middlewares/errorHandler';
+import { initializeDatabase } from './db/initDB';
 import cors from 'cors';
+import { PrismaClient } from '@prisma/client';
+
 
 const app = express();
-const db = new sqlite3.Database(':memory:'); // Use in-memory SQLite for simplicity
 const port = 3001;
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '10kb' }));
+app.use(apiLimiter);
+
+// initializeDatabase().then((db) => {
+//   app.locals.db = db;
+//   console.log('Database initialized');
+// });
+
+const prisma = new PrismaClient();
+app.locals.prisma = prisma;
+
+
 app.use(cors({
   origin: 'http://localhost:8080',  // Allow only requests from the frontend
   methods: ['GET', 'POST']           // Define allowed methods
 }));
 
-interface Job {
-  id: number;
-  title: string;
-  description: string;
-  requirements: string;
-  posterName: string;
-  contactInfo: string;
-  expirationTime: string;
-  createdAt: string;
-}
+//Routes
+app.use('/api', jobRoutes);
+app.use('/api', bidRoutes);
 
-interface Bid {
-  id: number;
-  jobId: number;
-  bidderName: string;
-  bidAmount: number;
-  createdAt: string;
-}
+//error handling
+app.use(errorHandler);
 
-// Create tables
-db.serialize(() => {
-  db.run(`
-    CREATE TABLE jobs (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT,
-      description TEXT,
-      requirements TEXT,
-      posterName TEXT,
-      contactInfo TEXT,
-      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-      expirationTime DATETIME
-    )
-  `);
-  db.run(`
-    CREATE TABLE bids (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      jobId INTEGER,
-      bidderName TEXT,
-      bidAmount REAL,
-      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (jobId) REFERENCES jobs(id)
-    )
-  `);
-});
 
+/*
 // API to create a new job
 app.post('/api/jobs', (req: Request, res: Response) => {
   const { title, description, requirements, posterName, contactInfo } = req.body;
@@ -120,6 +100,8 @@ app.post('/api/jobs/:id/bids', (req: Request, res: Response) => {
     res.status(201).json({ id: this.lastID });
   });
 });
+*/
+
 
 app.listen(port, () => {
   console.log(`Backend server is running on http://localhost:${port}`);

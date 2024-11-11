@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:mydb.db"
+}
+
+model Job {
+  id             Int      @id @default(autoincrement())
+  title          String
+  description    String
+  requirements   String
+  posterName     String
+  contactInfo    String
+  expirationTime DateTime
+  createdAt      DateTime @default(now())
+  bids           Bid[]
+}
+
+model Bid {
+  id         Int      @id @default(autoincrement())
+  jobId      Int
+  bidderName String
+  bidAmount  Float
+  createdAt  DateTime @default(now())
+  job        Job      @relation(fields: [jobId], references: [id])
+}

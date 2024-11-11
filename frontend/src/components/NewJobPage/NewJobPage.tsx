@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import './NewJobPage.css';
 
 const NewJobPage: React.FC = () => {
   const [jobData, setJobData] = useState({
@@ -19,7 +20,7 @@ const NewJobPage: React.FC = () => {
   };
 
   return (
-    <form className="new-job-form" onSubmit={handleSubmit}>
+    <form className="newJobForm" onSubmit={handleSubmit}>
       <input
         type="text"
         placeholder="Job Title"

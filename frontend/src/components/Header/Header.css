@@ -1,0 +1,26 @@
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;    
+    justify-content: space-around;
+  }
+  
+  h1{
+    color: white;
+    text-align: center;
+  }
+
+  nav ul li {
+    display: inline;
+  }
+  
+  nav ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+  }
+  
+  nav ul li a:hover {
+    background-color: #555;
+    border-radius: 5px;
+  }
