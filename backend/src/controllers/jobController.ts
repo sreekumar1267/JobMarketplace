@@ -94,9 +94,9 @@ export const getJobFromDB = async (req: Request, res: Response, next: NextFuncti
       const bids = jobWithBids?.bids as Array<{ bidAmount: number }>;
       const lowestBid = Math.min(...bids?.map( bid => bid.bidAmount));
       const bidsCount = jobWithBids?._count?.bids;
-      // jobWithBids.lowestBid = lowestBid;
-      // jobWithBids.bidsCount = bidsCount;
-      res.status(200).json({...jobWithBids, lowestBid, bidsCount});
+
+      let finalJobWithBidsObj = jobWithBids ? {...jobWithBids, lowestBid, bidsCount} : {};
+      res.status(200).json(finalJobWithBidsObj);
     } catch (error) {
       next(error);
     }
