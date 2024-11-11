@@ -21,6 +21,7 @@ const NewJobPage: React.FC = () => {
 
   return (
     <form className="newJobForm" onSubmit={handleSubmit}>
+      <h2>New Job Details</h2>
       <input
         type="text"
         placeholder="Job Title"

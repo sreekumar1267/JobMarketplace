@@ -7,9 +7,13 @@ export default {
     '^.+\\.[tj]sx?$': ['babel-jest', { presets: ['@nx/react/babel'] }],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
+  collectCoverage: true,
   coverageDirectory: './coverage/frontend',
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.[jt]s?(x)',
     '<rootDir>/src/**/*(*.)@(spec|test).[jt]s?(x)',
   ],
+  coverageReporters: ['html', 'text', 'text-summary', 'lcov'],
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['./setupTests.js'],
 };

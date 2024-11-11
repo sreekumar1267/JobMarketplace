@@ -16,21 +16,21 @@ interface Job {
     lowestBid?: number;
 }
 
-const fetchJobDetails = async (id:number): Promise<Job[]> => {
+const fetchJobDetails = async (id:string): Promise<Job> => {
   const response = await axios.get(`http://localhost:3001/api/jobs/${id}`);
   return response.data;
 };
 
-export const useFetchJobDetails = (id: number) => {
+export const useFetchJobDetails = (id: string) => {
   const dispatch = useDispatch();
 
-  return useQuery<Job[], Error>(
+  return useQuery<Job, Error>(
     {
         queryKey: ['jobDetails'],
         queryFn: ()=> fetchJobDetails(id),
         onSuccess: (data: Job) => {
           dispatch(setSelectedJob(data));
         },
-      } as UseQueryOptions<Job[], Error>
+      } as UseQueryOptions<Job, Error>
     );  
 };

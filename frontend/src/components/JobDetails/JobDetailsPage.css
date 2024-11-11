@@ -9,12 +9,46 @@
       margin: 0.5rem 0;
     }
   
-    form {
-      margin-top: 1rem;
-      input {
-        padding: 0.5rem;
-        margin-right: 0.5rem;
-      }
-    }
+  }
+
+  .title {
+    font-size: 24px;
+    font-weight: bold;
   }
   
+  .description,
+  .requirements,
+  .contact,
+  .expiration,
+  .bidCount,
+  .lowestBid {
+    margin: 10px 0;
+    font-size: 16px;
+  }
+  
+
+  .bidForm {
+    margin-top: 20px;
+    h2 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+  
+    .input {
+      width: 100%;
+      padding: 8px;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+  
+    .button {
+      padding: 8px 16px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+  }
