@@ -1,60 +1,126 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
+import bodyParser from 'body-parser';
 import sqlite3 from 'sqlite3';
+import { Request, Response } from 'express';
+import cors from 'cors';
 
 const app = express();
+const db = new sqlite3.Database(':memory:'); // Use in-memory SQLite for simplicity
 const port = 3001;
 
-// Create and setup the SQLite database
-const db = new sqlite3.Database(':memory:');
+app.use(bodyParser.json());
+app.use(cors({
+  origin: 'http://localhost:8080',  // Allow only requests from the frontend
+  methods: ['GET', 'POST']           // Define allowed methods
+}));
 
+interface Job {
+  id: number;
+  title: string;
+  description: string;
+  requirements: string;
+  posterName: string;
+  contactInfo: string;
+  expirationTime: string;
+  createdAt: string;
+}
+
+interface Bid {
+  id: number;
+  jobId: number;
+  bidderName: string;
+  bidAmount: number;
+  createdAt: string;
+}
+
+// Create tables
 db.serialize(() => {
-  db.run('CREATE TABLE users (id INT, name TEXT)');
-  db.run('INSERT INTO users (id, name) VALUES (1, "John Doe")');
+  db.run(`
+    CREATE TABLE jobs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT,
+      description TEXT,
+      requirements TEXT,
+      posterName TEXT,
+      contactInfo TEXT,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      expirationTime DATETIME
+    )
+  `);
+  db.run(`
+    CREATE TABLE bids (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      jobId INTEGER,
+      bidderName TEXT,
+      bidAmount REAL,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (jobId) REFERENCES jobs(id)
+    )
+  `);
 });
 
-// API route to get users
-app.get('/users', (req: Request, res: Response) => {
-  db.all('SELECT * FROM users', (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
+// API to create a new job
+app.post('/api/jobs', (req: Request, res: Response) => {
+  const { title, description, requirements, posterName, contactInfo } = req.body;
+  const expirationTime = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+  db.run(
+    'INSERT INTO jobs (title, description, requirements, posterName, contactInfo, expirationTime) VALUES (?, ?, ?, ?, ?, ?)',
+    [title, description, requirements, posterName, contactInfo, expirationTime],
+    function (err) {
+      if (err) return res.status(500).json(err);
+      res.status(201).json({ id: this.lastID });
     }
-    res.json({ data: rows });
-  });
+  );
 });
 
-// API route to add a user
-app.post('/users', (req: Request, res: Response) => {
-  const { id, name } = req.body;
-  if (id === undefined || name === undefined) {
-    res.status(400).json({ error: 'Please provide an id and name' });
-    return;
+// API to get jobs (with optional filtering)
+app.get('/api/jobs', (req: Request, res: Response) => {
+  const filter = req.query.filter as string;
+  let query = `
+    SELECT *,
+    (SELECT COUNT(*) FROM bids WHERE bids.jobId = jobs.id) as bidsCount,
+    (SELECT MIN(bidAmount) FROM bids WHERE bids.jobId = jobs.id) as lowestBid
+    FROM jobs
+  `;
+  if (filter === 'recent') {
+    query += ' ORDER BY createdAt DESC LIMIT 5';
+  } else if (filter === 'active') {
+    query += ' ORDER BY bidsCount DESC LIMIT 5';
   }
-  db.run('INSERT INTO users (id, name) VALUES (?, ?)', [id, name], (err: Error | null) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.status(201).json({ message: 'User added' });
+  db.all(query, (err, rows: Job[]) => {
+    if (err) return res.status(500).json(err);
+    res.json(rows);
   });
 });
 
-// API route to delete a user
-app.delete('/users/:id', (req: Request, res: Response) => {
-  const { id } = req.params;
-  db.run('DELETE FROM users WHERE id = ?', [id], function(err: Error | null) {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
+// API to get a specific job
+app.get('/api/jobs/:id', (req: Request, res: Response) => {
+  const jobId = req.params.id;
+  db.get(
+    `
+    SELECT *,
+    (SELECT MIN(bidAmount) FROM bids WHERE bids.jobId = jobs.id) as lowestBid,
+    (SELECT COUNT(*) FROM bids WHERE bids.jobId = jobs.id) as bidsCount
+    FROM jobs WHERE id = ?
+  `,
+    [jobId],
+    (err, row: Job) => {
+      if (err) return res.status(500).json(err);
+      res.json(row);
     }
-    if (this.changes === 0) {
-      res.status(404).json({ error: 'User not found' });
-      return;
-    }
-    res.status(200).json({ message: 'User deleted' });
+  );
+});
+
+// API to place a new bid
+app.post('/api/jobs/:id/bids', (req: Request, res: Response) => {
+  const jobId = req.params.id;
+  const { bidAmount } = req.body;
+  db.run('INSERT INTO bids (jobId, bidderName, bidAmount) VALUES (?, "Anonymous", ?)', [jobId, bidAmount], function (err) {
+    if (err) return res.status(500).json(err);
+    res.status(201).json({ id: this.lastID });
   });
 });
 
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Backend server is running on http://localhost:${port}`);
 });
