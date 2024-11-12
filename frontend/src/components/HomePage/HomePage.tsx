@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Job } from '../../app/types';
 import JobCard from '../JobCard/JobCard';
 import './HomePage.css';
 import { useFetchJobs } from '../../hooks/UseFetchJobs.tsx';
@@ -14,15 +12,19 @@ const HomePage: React.FC = () => {
   if (recentJobsError || activeJobsError) return <div>Error loading jobs</div>;
 
   return (
-    <div className="homePage">
+    <div className="homePageContainer">
       <h2>Recent Jobs</h2>
-      {recentJobs?.map((job) => (
-        <JobCard key={job.id} job={job} />
-      ))}
+      <div className="jobCardsContainer">
+        {recentJobs?.map((job) => (
+          <JobCard key={job.id} job={job} />
+        ))}
+      </div>        
       <h2>Most Active Jobs</h2>
-      {activeJobs?.map((job) => (
-        <JobCard key={job.id} job={job} />
-      ))}
+      <div className="jobCardsContainer">
+        {activeJobs?.map((job) => (
+          <JobCard key={job.id} job={job} />
+        ))}
+      </div>
     </div>
   );
 };

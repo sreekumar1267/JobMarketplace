@@ -13,7 +13,7 @@ const JobCard: React.FC<JobCardProps> = ({ job }:JobCardProps) => {
       <p>{job.description}</p>
       <p>Bids: {job.bidsCount}</p>
       <a href={`/job/${job.id}`}>
-         <button>View Details</button>
+         <button className="viewDetailsLink" >View Details</button>
       </a>
     </div>
   );
